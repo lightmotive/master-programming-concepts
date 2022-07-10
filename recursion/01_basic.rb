@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# require 'pry'
 # Sum the digits of a number
 # - Convert the number to a string.
 # - Sum each character converted to a number.
@@ -9,13 +10,10 @@ num = 123
 
 def sum_digits(num)
   chars = num.to_s.chars
-  sum = 0
 
-  for idx in 0...chars.size
-    sum += chars[idx].to_i
-  end
+  return chars.first.to_i if chars.size == 1
 
-  sum
+  sum_digits(chars.first) + sum_digits(chars[1..].join)
 end
 
 p sum_digits(num)
