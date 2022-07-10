@@ -11,8 +11,8 @@ def sum_digits(num)
   chars = num.to_s.chars
   sum = 0
 
-  chars.each do |char|
-    sum += char.to_i
+  for idx in 0...chars.size
+    sum += chars[idx].to_i
   end
 
   sum
