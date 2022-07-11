@@ -63,7 +63,7 @@ def sum_abs_diff(arr1, arr2)
     raise ArgumentError, 'The arrays must contain only Integer elements.'
   end
 
-  sum_abs_diff_iterate(arr1, arr2)
+  sum_abs_diff_recurse(arr1, arr2)
 end
 
 # Step 1: solve with loops
@@ -86,6 +86,7 @@ def sum_abs_diff_recurse(arr1, arr2)
   return 0 if arr1.size.zero?
 
   # Step 5: Recurse
+  (arr1.first - arr2.first).abs + sum_abs_diff_recurse(arr1[1..], arr2[1..])
 end
 
 begin
