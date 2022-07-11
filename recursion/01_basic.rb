@@ -66,6 +66,7 @@ def sum_abs_diff(arr1, arr2)
   sum_abs_diff_iterate(arr1, arr2)
 end
 
+# Step 1: solve with loops
 def sum_abs_diff_iterate(arr1, arr2)
   sum = 0
 
@@ -74,6 +75,13 @@ def sum_abs_diff_iterate(arr1, arr2)
   end
 
   sum
+end
+
+def sum_abs_diff_recurse(arr1, arr2)
+  # Step 2: Extract parameters
+  # Step 3: Deduce the base case
+  # Step 4: Solve the base case
+  # Step 5: Recurse
 end
 
 begin
@@ -90,5 +98,6 @@ rescue ArgumentError
   p true
 end
 
+p sum_abs_diff([], []).zero?
 p sum_abs_diff([3, 7], [19, 12]) == 21
 p sum_abs_diff([15, -4, 56, 10, -23], [14, -9, 56, 14, -23]) == 10
