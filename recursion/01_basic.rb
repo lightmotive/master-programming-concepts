@@ -79,8 +79,12 @@ end
 
 def sum_abs_diff_recurse(arr1, arr2)
   # Step 2: Extract parameters
+  # - arr1, arr2
   # Step 3: Deduce the base case
+  # - Array lengths are zero.
   # Step 4: Solve the base case
+  return 0 if arr1.size.zero?
+
   # Step 5: Recurse
 end
 
