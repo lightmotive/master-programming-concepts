@@ -33,13 +33,30 @@ p sum_digits(num)
 # - Each array is the same length.
 
 # Examples/Tests
-# sum_absolute_differences([1], [2, 3]) => ArgumentError
-# sum_absolute_differences([3, 7], [19, 12]) == 21
-# sum_absolute_differences(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
+# sum_abs_diff([1], [2, 3]) => ArgumentError
+# sum_abs_diff([3, 7], [19, 12]) == 21
+# sum_abs_diff(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
 
 # Data Structure
 # - Iterate through each index of the first array.
 
 # Algorithm
+# - Raise exception if arrays are not of the same length (separate method).
+# - Raise exception if arrays contain anything other than integers.
+# - Find sum_abs_diff between arr1 and arr2:
+#   sum = 0
+#   Iterate from (0...first array's length) |idx|
+#     sum += abs(arr1[idx] - arr2[idx])
+#
+#   sum
 
 # Code
+
+def sum_abs_diff(arr1, arr2)
+  # Validate inputs.
+  # Forward inputs to method that assumes correct input.
+end
+
+def sum_abs_diff_iterate(arr1, arr2)
+  # ...
+end
