@@ -36,7 +36,7 @@ p sum_digits(num) == 6
 # sum_abs_diff([1], [2, 3]) => ArgumentError
 # sum_abs_diff([1, 2], ['2', 3]) => ArgumentError
 # sum_abs_diff([3, 7], [19, 12]) == 21
-# sum_abs_diff(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
+# sum_abs_diff([15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
 
 # Data Structure
 # - Iterate through each index of the first array.
@@ -67,7 +67,13 @@ def sum_abs_diff(arr1, arr2)
 end
 
 def sum_abs_diff_iterate(arr1, arr2)
-  # ...
+  sum = 0
+
+  (0...arr1.size).each do |idx|
+    sum += (arr1[idx] - arr2[idx]).abs
+  end
+
+  sum
 end
 
 begin
@@ -84,5 +90,5 @@ rescue ArgumentError
   p true
 end
 
-# sum_abs_diff([3, 7], [19, 12]) == 21
-# sum_abs_diff(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
+p sum_abs_diff([3, 7], [19, 12]) == 21
+p sum_abs_diff([15, -4, 56, 10, -23], [14, -9, 56, 14, -23]) == 10
