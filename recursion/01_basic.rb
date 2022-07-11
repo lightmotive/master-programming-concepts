@@ -38,6 +38,7 @@ p sum_digits(num)
 # sum_absolute_differences(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
 
 # Data Structure
+# - Iterate through each index of the first array.
 
 # Algorithm
 
