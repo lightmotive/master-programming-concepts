@@ -18,7 +18,7 @@ def sum_digits(num)
   sum_digits(chars.first) + sum_digits(chars[1..].join)
 end
 
-p sum_digits(num)
+p sum_digits(num) == 6
 
 # Another problem:
 # - Get the absolute sum of the differences between two arrays of integers of
@@ -29,11 +29,12 @@ p sum_digits(num)
 #         numbers in 2 arrays.
 
 # Rules
-# - Each array contains only integers.
 # - Each array is the same length.
+# - Each array contains only integers.
 
 # Examples/Tests
 # sum_abs_diff([1], [2, 3]) => ArgumentError
+# sum_abs_diff([1, 2], ['2', 3]) => ArgumentError
 # sum_abs_diff([3, 7], [19, 12]) == 21
 # sum_abs_diff(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
 
@@ -52,11 +53,36 @@ p sum_digits(num)
 
 # Code
 
+def all_integers?(arr)
+  arr.all? { |e| e.instance_of?(Integer) }
+end
+
 def sum_abs_diff(arr1, arr2)
-  # Validate inputs.
-  # Forward inputs to method that assumes correct input.
+  raise ArgumentError, 'The array sizes must match.' if arr1.size != arr2.size
+  unless all_integers?(arr1) && all_integers?(arr2)
+    raise ArgumentError, 'The arrays must contain only Integer elements.'
+  end
+
+  sum_abs_diff_iterate(arr1, arr2)
 end
 
 def sum_abs_diff_iterate(arr1, arr2)
   # ...
 end
+
+begin
+  sum_abs_diff([1], [2, 3])
+  p false
+rescue ArgumentError
+  p true
+end
+
+begin
+  sum_abs_diff([1, 2], ['2', 3])
+  p false
+rescue ArgumentError
+  p true
+end
+
+# sum_abs_diff([3, 7], [19, 12]) == 21
+# sum_abs_diff(15,-4,56,10,-23], [14,-9,56,14,-23]) == 10
