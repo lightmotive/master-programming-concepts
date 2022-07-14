@@ -34,14 +34,16 @@ def merge3(l1, l2, &block)
       else l1.next
            l2.next
       end
+
   yield h
-  yield merge3(l1, l2, &block).next
+
+  merge3(l1, l2, &block)
 end
 
-# merge3 posted on SO: https://stackoverflow.com/a/72987311/2033465
+# merge3 solution posted on SO: https://stackoverflow.com/a/72987311/2033465
 
-require_relative 'ruby-common/benchmark_report'
-require_relative 'ruby-common/test'
+require_relative '../../ruby-common/benchmark_report'
+require_relative '../../ruby-common/test'
 
 TESTS = [
   { input: [-> { (1..Float::INFINITY).lazy.map { |x| x * 2 } },
