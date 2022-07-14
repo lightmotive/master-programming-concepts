@@ -57,13 +57,17 @@ def all_integers?(arr)
   arr.all? { |e| e.instance_of?(Integer) }
 end
 
-def sum_abs_diff(arr1, arr2)
-  raise ArgumentError, 'The array sizes must match.' if arr1.size != arr2.size
+def sum_abs_diff(arr1, arr2, mode)
+  return ArgumentError, 'The array sizes must match.' if arr1.size != arr2.size
   unless all_integers?(arr1) && all_integers?(arr2)
-    raise ArgumentError, 'The arrays must contain only Integer elements.'
+    return ArgumentError, 'The arrays must contain only Integer elements.'
   end
 
-  sum_abs_diff_recurse(arr1, arr2)
+  case mode
+  when :iterate then sum_abs_diff_iterate(arr1, arr2)
+  when :recurse_array_subset then sum_abs_diff_recurse_array_subset(arr1, arr2)
+  when :recurse_idx then sum_abs_diff_recurse_idx(arr1, arr2)
+  end
 end
 
 # Step 1: solve with loops
@@ -77,32 +81,49 @@ def sum_abs_diff_iterate(arr1, arr2)
   sum
 end
 
-def sum_abs_diff_recurse(arr1, arr2)
+def sum_abs_diff_recurse_array_subset(arr1, arr2)
   # Step 2: Extract parameters
   # - arr1, arr2
   # Step 3: Deduce the base case
   # - Array lengths are zero.
   # Step 4: Solve the base case
-  return 0 if arr1.size.zero?
+  return 0 if arr1.empty?
 
   # Step 5: Recurse
-  (arr1.first - arr2.first).abs + sum_abs_diff_recurse(arr1[1..], arr2[1..])
+  (arr1.first - arr2.first).abs + sum_abs_diff_recurse_array_subset(arr1[1..], arr2[1..])
 end
 
-begin
-  sum_abs_diff([1], [2, 3])
-  p false
-rescue ArgumentError
-  p true
+def sum_abs_diff_recurse_idx(arr1, arr2, idx = 0)
+  return 0 if idx == arr1.size
+
+  (arr1[idx] - arr2[idx]).abs + sum_abs_diff_recurse_idx(arr1, arr2, idx + 1)
 end
 
-begin
-  sum_abs_diff([1, 2], ['2', 3])
-  p false
-rescue ArgumentError
-  p true
+require_relative '../../ruby-common/benchmark_report'
+require_relative '../../ruby-common/test'
+
+def create_array(size)
+  arr = []
+  arr.push(Rand(1000)) while arr.size < size
 end
 
-p sum_abs_diff([], []).zero?
-p sum_abs_diff([3, 7], [19, 12]) == 21
-p sum_abs_diff([15, -4, 56, 10, -23], [14, -9, 56, 14, -23]) == 10
+TESTS = [
+  { input: [[], []], expected_output: 0 },
+  { input: [[3, 7], [19, 12]], expected_output: 21 },
+  { input: [[15, -4, 56, 10, -23], [14, -9, 56, 14, -23]], expected_output: 10 },
+  { input: [[1], [2, 3]], expected_output: ArgumentError },
+  { input: [[1, 2], ['2', 3]], expected_output: ArgumentError }
+].freeze
+
+run_tests('sum_abs_diff_iterate', TESTS, ->(input) { sum_abs_diff(*input, :iterate) })
+run_tests('sum_abs_diff_recurse_array_subset', TESTS,
+          ->(input) { sum_abs_diff(*input, :recurse_array_subset) })
+run_tests('sum_abs_diff_recurse_idx', TESTS, ->(input) { sum_abs_diff(*input, :recurse_idx) })
+
+benchmark_report(3, 50, TESTS,
+                 [
+                   { label: 'sum_abs_diff_iterate', method: ->(input) { sum_abs_diff(*input, :iterate) } },
+                   { label: 'sum_abs_diff_recurse_array_subset',
+                     method: ->(input) { sum_abs_diff(*input, :recurse_array_subset) } },
+                   { label: 'sum_abs_diff_recurse_idx', method: ->(input) { sum_abs_diff(*input, :recurse_idx) } }
+                 ])
