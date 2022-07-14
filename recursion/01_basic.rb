@@ -58,9 +58,9 @@ def all_integers?(arr)
 end
 
 def sum_abs_diff(arr1, arr2, mode)
-  return ArgumentError, 'The array sizes must match.' if arr1.size != arr2.size
+  raise ArgumentError, 'The array sizes must match.' if arr1.size != arr2.size
   unless all_integers?(arr1) && all_integers?(arr2)
-    return ArgumentError, 'The arrays must contain only Integer elements.'
+    raise ArgumentError, 'The arrays must contain only Integer elements.'
   end
 
   case mode
@@ -68,6 +68,8 @@ def sum_abs_diff(arr1, arr2, mode)
   when :recurse_array_subset then sum_abs_diff_recurse_array_subset(arr1, arr2)
   when :recurse_idx then sum_abs_diff_recurse_idx(arr1, arr2)
   end
+rescue ArgumentError
+  ArgumentError
 end
 
 # Step 1: solve with loops
@@ -104,15 +106,21 @@ require_relative '../../ruby-common/test'
 
 def create_array(size)
   arr = []
-  arr.push(Rand(1000)) while arr.size < size
+  arr.push(rand(1000)) while arr.size < size
+  arr
 end
 
+test_large_array1 = create_array(500)
+test_large_array2 = create_array(500)
+test_large_array_result = sum_abs_diff(test_large_array1, test_large_array2, :iterate)
+
 TESTS = [
+  { input: [[1], [2, 3]], expected_output: ArgumentError },
+  { input: [[1, 2], ['2', 3]], expected_output: ArgumentError },
   { input: [[], []], expected_output: 0 },
   { input: [[3, 7], [19, 12]], expected_output: 21 },
   { input: [[15, -4, 56, 10, -23], [14, -9, 56, 14, -23]], expected_output: 10 },
-  { input: [[1], [2, 3]], expected_output: ArgumentError },
-  { input: [[1, 2], ['2', 3]], expected_output: ArgumentError }
+  { input: [test_large_array1, test_large_array2], expected_output: test_large_array_result }
 ].freeze
 
 run_tests('sum_abs_diff_iterate', TESTS, ->(input) { sum_abs_diff(*input, :iterate) })
@@ -127,3 +135,13 @@ benchmark_report(3, 50, TESTS,
                      method: ->(input) { sum_abs_diff(*input, :recurse_array_subset) } },
                    { label: 'sum_abs_diff_recurse_idx', method: ->(input) { sum_abs_diff(*input, :recurse_idx) } }
                  ])
+
+# What I learned:
+# - Only use recursion when absolutely necessary. In this case, iteration is
+#   faster and easier to comprehend.
+# - When recursing with collections, index incrementation offers significantly
+#   faster performance than passing subsets, especially with larger collections.
+#   Why? I would guess that subset recursion requires significantly more
+#   resources (processing time to build a new array, and memory to store the
+#   subset arrays even though they simply point to existing objects).
+#   - Use subsets only when necessary.
