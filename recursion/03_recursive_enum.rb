@@ -40,7 +40,20 @@ def merge3(l1, l2, &block)
   merge3(l1, l2, &block)
 end
 
-# merge3 solution posted on SO: https://stackoverflow.com/a/72987311/2033465
+def merge4(l1, l2)
+  Enumerator.new do |yielder|
+    loop do
+      h = case l1.peek <=> l2.peek
+          when -1 then l1.next
+          when +1 then l2.next
+          else l1.next
+               l2.next
+          end
+
+      yielder << h
+    end
+  end.lazy
+end
 
 require_relative '../../ruby-common/benchmark_report'
 require_relative '../../ruby-common/test'
@@ -65,10 +78,31 @@ end
 run_tests('merge1', TESTS, ->(input) { test_helper(:merge1, input) })
 run_tests('merge2', TESTS, ->(input) { test_helper(:merge2, input) })
 run_tests('merge3', TESTS, ->(input) { test_enum_for_helper(:merge3, input) })
+run_tests('merge4', TESTS, ->(input) { test_helper(:merge4, input) })
 
 benchmark_report(1, 100, TESTS,
                  [
                    { label: 'merge1', method: ->(input) { test_helper(:merge1, input) } },
                    { label: 'merge2', method: ->(input) { test_helper(:merge2, input) } },
-                   { label: 'merge3', method: ->(input) { test_enum_for_helper(:merge3, input) } }
+                   { label: 'merge3', method: ->(input) { test_enum_for_helper(:merge3, input) } },
+                   { label: 'merge4', method: ->(input) { test_helper(:merge4, input) } }
                  ])
+
+TESTS_NON_INFINITE = [
+  { input: [-> { (1..5).lazy.map { |x| x * 2 } },
+            -> { (1..5).lazy.map { |x| x * 3 } }],
+    expected_output: [2, 3, 4, 6, 8, 9, 10] }
+].freeze
+
+puts
+puts '*** Non-infinite enumeration ***'
+run_tests('merge4', TESTS_NON_INFINITE, ->(input) { test_helper(:merge4, input) })
+benchmark_report(1, 100, TESTS_NON_INFINITE,
+                 [
+                   { label: 'merge4', method: ->(input) { test_helper(:merge4, input) } }
+                 ])
+
+# ** What I learned **
+# Use the right tool for the job. A straight-forward loop is a better option
+# here! Posted merge3 and merge4 solutions on SO:
+# https://stackoverflow.com/a/72987311/2033465
