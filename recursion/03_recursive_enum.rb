@@ -48,22 +48,27 @@ require_relative '../../ruby-common/test'
 TESTS = [
   { input: [-> { (1..Float::INFINITY).lazy.map { |x| x * 2 } },
             -> { (1..Float::INFINITY).lazy.map { |x| x * 3 } }],
-    expected_output: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15] }
+    expected_output: [2, 3, 4, 6, 8, 9, 10, 12, 14, 15] },
+  { input: [-> { (100..Float::INFINITY).lazy.map { |x| x * 2 } },
+            -> { (100..Float::INFINITY).lazy.map { |x| x * 2.1 } }],
+    expected_output: [200, 202, 204, 206, 208, 210.0, 212, 212.10000000000002, 214, 214.20000000000002] }
 ].freeze
 
-run_tests('merge1', TESTS, ->(input) { merge1(input[0].call, input[1].call).first(10).to_a })
-run_tests('merge2', TESTS, ->(input) { merge2(input[0].call, input[1].call).first(10).to_a })
-run_tests('merge3', TESTS, lambda { |input|
-  enum_for(:merge3,
-           input[0].call,
-           input[1].call).lazy.first(10).to_a
-})
+def test_helper(method, input)
+  send(method, input[0].call, input[1].call).first(10).to_a
+end
 
-benchmark_report(3, 50, TESTS,
+def test_enum_for_helper(method, input)
+  enum_for(method, input[0].call, input[1].call).lazy.first(10).to_a
+end
+
+run_tests('merge1', TESTS, ->(input) { test_helper(:merge1, input) })
+run_tests('merge2', TESTS, ->(input) { test_helper(:merge2, input) })
+run_tests('merge3', TESTS, ->(input) { test_enum_for_helper(:merge3, input) })
+
+benchmark_report(1, 100, TESTS,
                  [
-                   { label: 'merge1', method: ->(input) { merge1(input[0].call, input[1].call).first(10).to_a } },
-                   { label: 'merge2', method: ->(input) { merge2(input[0].call, input[1].call).first(10).to_a } },
-                   { label: 'merge3', method: lambda { |input|
-                                                enum_for(:merge3, input[0].call, input[1].call).lazy.first(10).to_a
-                                              } }
+                   { label: 'merge1', method: ->(input) { test_helper(:merge1, input) } },
+                   { label: 'merge2', method: ->(input) { test_helper(:merge2, input) } },
+                   { label: 'merge3', method: ->(input) { test_enum_for_helper(:merge3, input) } }
                  ])
