@@ -93,15 +93,30 @@ class ArrayCustom
   end
 
   def combination(c_size, yield_indices: false)
-    return [[]] if c_size.zero?
-    return [] if c_size.negative? || array.empty? || c_size > array.size
+    is_valid, validation_result = combination_validate(c_size)
+    return validation_result unless is_valid
 
     enum_for(:combination_each, c_size, yield_indices)
+  end
+
+  # For better performance when loading all combinations into an array???
+  def combination_all(c_size)
+    is_valid, validation_result = combination_validate(c_size)
+    return validation_result unless is_valid
+
+    combination_all_recurse(c_size)
   end
 
   private
 
   attr_reader :array
+
+  def combination_validate(c_size)
+    return [false, [[]]] if c_size.zero?
+    return [false, []] if c_size.negative? || array.empty? || c_size > array.size
+
+    [true, nil]
+  end
 
   def combination_each(c_size, yield_indices,
                        combo: [], parent_level_idx: 0, level: 0,
@@ -118,10 +133,32 @@ class ArrayCustom
                        &block)
     end
   end
+
+  def combination_all_recurse(c_size,
+                              combo: [], parent_level_idx: 0, level: 0,
+                              combos: [])
+    range_start = level.zero? ? 0 : parent_level_idx + 1
+    range_end = array.size - c_size + level
+
+    (range_start..range_end).each do |idx|
+      combo[level] = array[idx]
+      next combos << combo.dup if level == c_size - 1
+
+      combination_all_recurse(c_size,
+                              combo: combo, parent_level_idx: idx, level: level + 1,
+                              combos: combos)
+    end
+
+    combos
+  end
 end
 
 def combinations_via_enumeration(arr, c_size)
   ArrayCustom.new(arr).combination(c_size).to_a
+end
+
+def combinations_all2(arr, c_size)
+  ArrayCustom.new(arr).combination_all(c_size)
 end
 
 def example_combination_enumeration(arr, c_size)
@@ -192,13 +229,15 @@ TESTS = [
 ].freeze
 
 run_tests('combinations_all', TESTS, ->(input) { combinations_all(*input) })
-run_tests('combination_via_enum', TESTS, ->(input) { combinations_via_enumeration(*input) })
+run_tests('combinations_via_enum', TESTS, ->(input) { combinations_via_enumeration(*input) })
+run_tests('combinations_all2', TESTS, ->(input) { combinations_all2(*input) })
 run_tests('combination_std_lib', TESTS, ->(input) { combination_std_lib(*input) })
 
 benchmark_report(2, 3, TESTS,
                  [
                    { label: 'combinations_all', method: ->(input) { combinations_all(*input) } },
                    { label: 'combination_via_enum', method: ->(input) { combinations_via_enumeration(*input) } },
+                   { label: 'combinations_all2', method: ->(input) { combinations_all2(*input) } },
                    { label: 'combination_std_lib', method: ->(input) { combination_std_lib(*input) } }
                  ])
 
@@ -206,3 +245,6 @@ benchmark_report(2, 3, TESTS,
 # - Not surprisingly, the Standard Library's **Array#combination** is much
 #   faster than any custom implementation.
 # - With larger sets, enumeration can be a bit slower than the original method.
+# - Enumeration over large sets carries a 25-30% performance hit (roughly).
+#   - Ruby must optimize performance at the runtime layer (C) to avoid that
+#     performance hit. As usual, use built-in Ruby functions when possible.
