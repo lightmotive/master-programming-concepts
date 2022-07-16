@@ -134,6 +134,28 @@ class ArrayCustom
     end
   end
 
+  # `combination_each` example:
+  # Given `self.array` = [1, 2, 3]
+  # combination_each(c_size = 2)
+  #
+  # (0..1).each do |idx|
+  #   combo[0] = array[0]
+  #
+  #   combination_each(c_size: 2, combo: [1], parent_level_idx: 0, level: 1)
+  #     (1..2).each do |idx_l1|
+  #       combo[1] = 2
+  #       next yield [1, 2]
+  #     end
+  #
+  #   combo[0] = array[1]
+  #
+  #   combination_each(c_size: 2, combo: [2, 2], parent_level_idx: 1, level: 1)
+  #     (2..2).each do |idx_l1|
+  #       combo[1] = 3
+  #       next yield [2, 3]
+  #     end
+  # end
+
   def combination_all_recurse(c_size,
                               combo: [], parent_level_idx: 0, level: 0,
                               combos: [])
