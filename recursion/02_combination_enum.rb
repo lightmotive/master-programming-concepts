@@ -151,6 +151,9 @@ def combination_std_lib(arr, c_size)
   arr.combination(c_size).to_a
 end
 
+require 'json'
+# File.write('./combination52-5.json', JSON.dump(combinations_via_enumeration((1..52).to_a, 5).to_a))
+
 require_relative '../../ruby-common/benchmark_report'
 require_relative '../../ruby-common/test'
 
@@ -183,19 +186,23 @@ TESTS = [
                       [13, 7, 5, 10], [13, 7, 5, 16], [13, 7, 5, 21], [13, 7, 10, 16],
                       [13, 7, 10, 21], [13, 7, 16, 21], [13, 5, 10, 16], [13, 5, 10, 21],
                       [13, 5, 16, 21], [13, 10, 16, 21], [7, 5, 10, 16], [7, 5, 10, 21],
-                      [7, 5, 16, 21], [7, 10, 16, 21], [5, 10, 16, 21]] }
+                      [7, 5, 16, 21], [7, 10, 16, 21], [5, 10, 16, 21]] },
+  { input: [(1..52).to_a, 5],
+    expected_output: JSON.parse(File.read('./combination52-5.json')) }
 ].freeze
 
 run_tests('combinations_all', TESTS, ->(input) { combinations_all(*input) })
 run_tests('combination_via_enum', TESTS, ->(input) { combinations_via_enumeration(*input) })
 run_tests('combination_std_lib', TESTS, ->(input) { combination_std_lib(*input) })
 
-benchmark_report(3, 50, TESTS,
+benchmark_report(2, 3, TESTS,
                  [
                    { label: 'combinations_all', method: ->(input) { combinations_all(*input) } },
                    { label: 'combination_via_enum', method: ->(input) { combinations_via_enumeration(*input) } },
                    { label: 'combination_std_lib', method: ->(input) { combination_std_lib(*input) } }
                  ])
 
-# Not surprisingly, the Standard Library's **Array#combination** is much faster
-# than any custom implementation.
+# ** What I learned **
+# - Not surprisingly, the Standard Library's **Array#combination** is much
+#   faster than any custom implementation.
+# - With larger sets, enumeration can be a bit slower than the original method.
