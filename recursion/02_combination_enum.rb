@@ -121,55 +121,31 @@ class ArrayCustom
   end
 
   def combination_each(c_size, yield_indices,
-                       combo: [], parent_level_idx: 0, level: 0,
+                       start_idx: 0, combo: [], level: 0,
                        &block)
-    range_start = level.zero? ? 0 : parent_level_idx + 1
-    range_end = array.size - c_size + level
+    end_idx = array.size - c_size + level
 
-    (range_start..range_end).each do |idx|
+    (start_idx..end_idx).each do |idx|
       combo[level] = yield_indices ? idx : array[idx]
       next yield combo.dup if level == c_size - 1
 
       combination_each(c_size, yield_indices,
-                       combo: combo, parent_level_idx: idx, level: level + 1,
+                       start_idx: idx + 1, combo: combo, level: level + 1,
                        &block)
     end
   end
 
-  # `combination_each` example:
-  # Given `self.array` = [1, 2, 3]
-  # combination_each(c_size = 2)
-  #
-  # (0..1).each do |idx|
-  #   combo[0] = array[0]
-  #
-  #   combination_each(c_size: 2, combo: [1], parent_level_idx: 0, level: 1)
-  #     (1..2).each do |idx_l1|
-  #       combo[1] = 2
-  #       next yield [1, 2]
-  #     end
-  #
-  #   combo[0] = array[1]
-  #
-  #   combination_each(c_size: 2, combo: [2, 2], parent_level_idx: 1, level: 1)
-  #     (2..2).each do |idx_l1|
-  #       combo[1] = 3
-  #       next yield [2, 3]
-  #     end
-  # end
-
   def combination_all_recurse(c_size,
-                              combo: [], parent_level_idx: 0, level: 0,
+                              start_idx: 0, combo: [], level: 0,
                               combos: [])
-    range_start = level.zero? ? 0 : parent_level_idx + 1
-    range_end = array.size - c_size + level
+    end_idx = array.size - c_size + level
 
-    (range_start..range_end).each do |idx|
+    (start_idx..end_idx).each do |idx|
       combo[level] = array[idx]
       next combos << combo.dup if level == c_size - 1
 
       combination_all_recurse(c_size,
-                              combo: combo, parent_level_idx: idx, level: level + 1,
+                              start_idx: idx + 1, combo: combo, level: level + 1,
                               combos: combos)
     end
 
@@ -268,6 +244,6 @@ benchmark_report(2, 3, TESTS,
 # ** What I learned **
 # - Not surprisingly, the Standard Library's **Array#combination** is much
 #   faster than any custom implementation.
-# - With larger sets, enumeration can be 25-35% slower.
+# - With larger sets, enumeration can be 50% slower.
 #   - Ruby must optimize performance at the runtime layer (C) to avoid that
 #     performance hit. As usual, use built-in Ruby functions when possible.
