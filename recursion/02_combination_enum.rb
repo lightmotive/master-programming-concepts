@@ -12,17 +12,19 @@
 #     the combination selection algorithm can be used with virtually any structure.
 
 # rubocop:disable Metrics/ParameterLists
-def combinations_recurse(input_array, c_size, start_idx = 0,
-                         combo = [], combo_idx = 0, combos = [])
-  return (combos << combo.dup) if combo_idx == c_size
-
+# Recursion adapted and simplified from [this source](https://www.baeldung.com/java-combinations-algorithm#:~:text=let's%20write%20the%20recursive%20method%20to%20implement%20this%20approach)
+def combinations_recurse(input_array, c_size,
+                         start_idx = 0, combo = [], combo_idx = 0, combos = [])
   end_idx = input_array.size - 1
 
-  # Simpler loop adapted from [this source](https://www.baeldung.com/java-combinations-algorithm#:~:text=let's%20write%20the%20recursive%20method%20to%20implement%20this%20approach)
   max = [end_idx, end_idx + 1 - combo.length + combo_idx].min
   (start_idx..max).each do |idx|
     combo[combo_idx] = input_array[idx]
-    combinations_recurse(input_array, c_size, idx + 1, combo, combo_idx + 1, combos)
+
+    next (combos << combo.dup) if combo_idx == c_size - 1
+
+    combinations_recurse(input_array, c_size,
+                         idx + 1, combo, combo_idx + 1, combos)
   end
 
   combos
@@ -266,7 +268,6 @@ benchmark_report(2, 3, TESTS,
 # ** What I learned **
 # - Not surprisingly, the Standard Library's **Array#combination** is much
 #   faster than any custom implementation.
-# - With larger sets, enumeration can be a bit slower than the original method.
-# - Enumeration over large sets carries a 25-30% performance hit (roughly).
+# - With larger sets, enumeration can be 25-35% slower.
 #   - Ruby must optimize performance at the runtime layer (C) to avoid that
 #     performance hit. As usual, use built-in Ruby functions when possible.
