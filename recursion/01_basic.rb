@@ -110,8 +110,8 @@ def create_array(size)
   arr
 end
 
-test_large_array1 = create_array(500)
-test_large_array2 = create_array(500)
+test_large_array1 = create_array(5000)
+test_large_array2 = create_array(5000)
 test_large_array_result = sum_abs_diff(test_large_array1, test_large_array2, :iterate)
 
 TESTS = [
