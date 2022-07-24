@@ -17,7 +17,7 @@ def combinations_recurse(input_array, c_size,
                          start_idx = 0, combo = [], combo_idx = 0, combos = [])
   end_idx = input_array.size - 1
 
-  max = [end_idx, end_idx + 1 - combo.length + combo_idx].min
+  max = [end_idx, end_idx + 1 - combo.size + combo_idx].min
   (start_idx..max).each do |idx|
     combo[combo_idx] = input_array[idx]
 
