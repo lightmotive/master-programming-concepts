@@ -14,17 +14,17 @@
 # rubocop:disable Metrics/ParameterLists
 # Recursion adapted and simplified from [this source](https://www.baeldung.com/java-combinations-algorithm#:~:text=let's%20write%20the%20recursive%20method%20to%20implement%20this%20approach)
 def combinations_recurse(input_array, c_size,
-                         start_idx = 0, combo = [], combo_idx = 0, combos = [])
+                         start_idx = 0, combo = [], c_idx = 0, combos = [])
   end_idx = input_array.size - 1
 
-  max = [end_idx, end_idx + 1 - combo.size + combo_idx].min
+  max = [end_idx, end_idx + 1 - combo.size + c_idx].min
   (start_idx..max).each do |idx|
-    combo[combo_idx] = input_array[idx]
+    combo[c_idx] = input_array[idx]
 
-    next (combos << combo.dup) if combo_idx == c_size - 1
+    next (combos << combo.dup) if c_idx == c_size - 1
 
     combinations_recurse(input_array, c_size,
-                         idx + 1, combo, combo_idx + 1, combos)
+                         idx + 1, combo, c_idx + 1, combos)
   end
 
   combos
@@ -133,18 +133,18 @@ class ArrayCustom
     end
   end
 
-  def combination_all_recurse(c_size,
-                              start_idx: 0, combo: [], level: 0,
-                              combos: [])
-    end_idx = array.size - c_size + level
+  def combination_all_recurse(c_size, combos: [],
+                              start_idx: 0,
+                              combo: [], c_idx: 0)
+    end_idx = array.size - c_size + c_idx
 
     (start_idx..end_idx).each do |idx|
-      combo[level] = array[idx]
-      next combos << combo.dup if level == c_size - 1
+      combo[c_idx] = array[idx]
+      next combos << combo.dup if c_idx == c_size - 1
 
-      combination_all_recurse(c_size,
-                              start_idx: idx + 1, combo: combo, level: level + 1,
-                              combos: combos)
+      combination_all_recurse(c_size, combos: combos,
+                                      start_idx: idx + 1,
+                                      combo: combo, c_idx: c_idx + 1)
     end
 
     combos
@@ -231,7 +231,7 @@ run_tests('combinations_via_enum', TESTS, ->(input) { combinations_via_enumerati
 run_tests('combinations_all2', TESTS, ->(input) { combinations_all2(*input) })
 run_tests('combination_std_lib', TESTS, ->(input) { combination_std_lib(*input) })
 
-benchmark_report(2, 3, TESTS,
+benchmark_report(1, 1, TESTS,
                  [
                    { label: 'combinations_all', method: ->(input) { combinations_all(*input) } },
                    { label: 'combination_via_enum', method: ->(input) { combinations_via_enumeration(*input) } },
@@ -245,5 +245,3 @@ benchmark_report(2, 3, TESTS,
 # - With larger sets, enumeration can be 50% slower.
 #   - Ruby must optimize performance at the runtime layer (C) to avoid that
 #     performance hit. As usual, use built-in Ruby functions when possible.
-
-# *** Latest logical processing attempt ***
