@@ -95,29 +95,27 @@ class ArrayCustom
   end
 
   def combination(c_size, yield_indices: false)
-    is_valid, validation_result = combination_validate(c_size)
-    return validation_result unless is_valid
-
-    enum_for(:combination_each, c_size, yield_indices)
+    combination_with_validation(c_size) do
+      enum_for(:combination_each, c_size, yield_indices)
+    end
   end
 
   # For better performance when loading all combinations into an array???
   def combination_all(c_size)
-    is_valid, validation_result = combination_validate(c_size)
-    return validation_result unless is_valid
-
-    combination_all_recurse(c_size)
+    combination_with_validation(c_size) do
+      combination_all_recurse(c_size)
+    end
   end
 
   private
 
   attr_reader :array
 
-  def combination_validate(c_size)
-    return [false, [[]]] if c_size.zero?
-    return [false, []] if c_size.negative? || array.empty? || c_size > array.size
+  def combination_with_validation(c_size)
+    return [[]] if c_size.zero?
+    return [] if c_size.negative? || array.empty? || c_size > array.size
 
-    [true, nil]
+    yield
   end
 
   def combination_each(c_size, yield_indices,
@@ -247,3 +245,5 @@ benchmark_report(2, 3, TESTS,
 # - With larger sets, enumeration can be 50% slower.
 #   - Ruby must optimize performance at the runtime layer (C) to avoid that
 #     performance hit. As usual, use built-in Ruby functions when possible.
+
+# *** Latest logical processing attempt ***
