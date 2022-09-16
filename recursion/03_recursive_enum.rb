@@ -80,13 +80,13 @@ run_tests('merge2', TESTS, ->(input) { test_helper(:merge2, input) })
 run_tests('merge3', TESTS, ->(input) { test_enum_for_helper(:merge3, input) })
 run_tests('merge4', TESTS, ->(input) { test_helper(:merge4, input) })
 
-benchmark_report(1, 100, TESTS,
+benchmark_report(TESTS,
                  [
                    { label: 'merge1', method: ->(input) { test_helper(:merge1, input) } },
                    { label: 'merge2', method: ->(input) { test_helper(:merge2, input) } },
                    { label: 'merge3', method: ->(input) { test_enum_for_helper(:merge3, input) } },
                    { label: 'merge4', method: ->(input) { test_helper(:merge4, input) } }
-                 ])
+                 ], iterations: 100)
 
 TESTS_NON_INFINITE = [
   { input: [-> { (1..5).lazy.map { |x| x * 2 } },
@@ -97,10 +97,10 @@ TESTS_NON_INFINITE = [
 puts
 puts '*** Non-infinite enumeration ***'
 run_tests('merge4', TESTS_NON_INFINITE, ->(input) { test_helper(:merge4, input) })
-benchmark_report(1, 100, TESTS_NON_INFINITE,
+benchmark_report(TESTS_NON_INFINITE,
                  [
                    { label: 'merge4', method: ->(input) { test_helper(:merge4, input) } }
-                 ])
+                 ], iterations: 100)
 
 # ** What I learned **
 # Use the right tool for the job. A straight-forward loop is a better option

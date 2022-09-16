@@ -231,7 +231,7 @@ run_tests('combinations_via_enum', TESTS, ->(input) { combinations_via_enumerati
 run_tests('combinations_all2', TESTS, ->(input) { combinations_all2(*input) })
 run_tests('combination_std_lib', TESTS, ->(input) { combination_std_lib(*input) })
 
-benchmark_report(1, 1, TESTS,
+benchmark_report(TESTS,
                  [
                    { label: 'combinations_all', method: ->(input) { combinations_all(*input) } },
                    { label: 'combination_via_enum', method: ->(input) { combinations_via_enumeration(*input) } },

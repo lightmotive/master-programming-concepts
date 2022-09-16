@@ -128,13 +128,13 @@ run_tests('sum_abs_diff_recurse_array_subset', TESTS,
           ->(input) { sum_abs_diff(*input, :recurse_array_subset) })
 run_tests('sum_abs_diff_recurse_idx', TESTS, ->(input) { sum_abs_diff(*input, :recurse_idx) })
 
-benchmark_report(3, 50, TESTS,
+benchmark_report(TESTS,
                  [
                    { label: 'sum_abs_diff_iterate', method: ->(input) { sum_abs_diff(*input, :iterate) } },
                    { label: 'sum_abs_diff_recurse_array_subset',
                      method: ->(input) { sum_abs_diff(*input, :recurse_array_subset) } },
                    { label: 'sum_abs_diff_recurse_idx', method: ->(input) { sum_abs_diff(*input, :recurse_idx) } }
-                 ])
+                 ], iterations: 50)
 
 # What I learned:
 # - Only use recursion when absolutely necessary. In this case, iteration is
