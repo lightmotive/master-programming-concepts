@@ -115,17 +115,17 @@ end
 case ARGV[0]
 when 'robot' then RobotBenchmark.new(
   RobotBenchmarkNonFactoryConfig.new(
-    '../../.././ls-rb130-exercises/07_challenges/medium/robot.rb'
+    '../../../ls-rb130-exercises/07_challenges/medium/robot.rb'
   )
 ).run
 when 'robot_alt' then RobotBenchmark.new(
   RobotBenchmarkNonFactoryConfig.new(
-    '../../.././ls-rb130-exercises/07_challenges/medium/robot_alt.rb',
+    '../../../ls-rb130-exercises/07_challenges/medium/robot_alt.rb',
     reset_count: 50_000
   )
 ).run
 when 'robot_scalable' then RobotBenchmark.new(
-  RobotBenchmarkFactoryConfig.new('./lib/robot_scalable.rb', reset_count: 50_000)
+  RobotBenchmarkFactoryConfig.new('./lib/robot_factory.rb', reset_count: 50_000)
 ).run
 end
 

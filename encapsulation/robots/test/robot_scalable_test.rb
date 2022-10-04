@@ -2,7 +2,7 @@
 
 require 'minitest'
 require 'minitest/autorun'
-require './lib/robot_scalable'
+require './lib/robot_factory'
 
 class RobotScalableTest < Minitest::Test
   DIFFERENT_ROBOT_NAME_SEED = 1234
