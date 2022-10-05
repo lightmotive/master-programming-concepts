@@ -38,11 +38,12 @@ class RobotFactory
   # Always returns Robot object array, even if array contains name strings.
   def reset_robots(robot_or_name_array)
     robots_to_reset = robot_or_name_array.map(&method(:robot_by))
-    robots_to_reset.each do |robot|
-      robot_reset!(robot)
-      yield robot if block_given?
+    robots.batch_process do
+      robots_to_reset.each do |robot|
+        robot_reset!(robot)
+        yield robot if block_given?
+      end
     end
-    robots.batch_maintenance_completed!
     robots_to_reset
   end
 
@@ -56,6 +57,10 @@ class RobotFactory
 
   def [](*args)
     robots.[](*args)
+  end
+
+  def count_online
+    robots.size
   end
 
   def robots_all

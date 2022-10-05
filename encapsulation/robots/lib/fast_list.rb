@@ -5,11 +5,12 @@
 # - Uses binary search internally, so the list is always sorted.
 #
 # Key public behaviors:
-# - `add(item)`:
-# - `add_count(count) { |idx| item_to_add }`: add a number of items
-#   sequentially. Improves performance.
-# - `batch_maintenance_completed!`: invoke after modifying items that would
-#   change the sort order.
+# - `#add(item)`:
+# - `#add_count(count) { |idx| item_to_add }`: add a number of items
+#   sequentially. Improves performance over sequential `#add` invocations.
+# - `#batch_process { ... }`: provide block that processes multiple objects
+#   that are stored in list. Must be used when mutating list items in a way that
+#   would change sort order. List is sorted after block returns.
 class FastList
   def initialize
     @items = []
@@ -40,12 +41,19 @@ class FastList
     count.times do
       items << yield
     end
-    batch_maintenance_completed!
+    batch_completed!
   end
 
-  def batch_maintenance_completed!
-    items.sort!
+  def batch_process
+    yield
+    batch_completed!
   end
+
+  def size
+    items.size
+  end
+
+  alias length size
 
   def [](*args)
     items.[](*args)
@@ -58,4 +66,8 @@ class FastList
   private
 
   attr_reader :items
+
+  def batch_completed!
+    items.sort!
+  end
 end
