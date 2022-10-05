@@ -58,4 +58,32 @@ class RobotFactoryTest < Minitest::Test
     assert_equal(robots.map(&:object_id), reset_robots.map(&:object_id))
     assert_equal(0, original_robot_names.intersection(reset_robots.map(&:name)).size)
   end
+
+  def test_reset_robots_by_name
+    robots = @factory.create_robots(3).robots_all
+    original_robot_names = robots.map(&:name)
+    reset_robots = @factory.reset_robots(original_robot_names)
+    assert_equal(0, original_robot_names.intersection(reset_robots.map(&:name)).size)
+  end
+
+  def test_reset_invalid_object_raises_exception
+    assert_raises(StandardError) { @factory.create_robots(3).reset_robot(1) }
+  end
+
+  def test_shutdown_robot
+    robots = @factory.create_robots(3).robots_all
+    @factory.shutdown_robot(robots[1])
+    robots.delete(robots[1])
+    assert_equal(robots, @factory.robots_all)
+  end
+
+  def test_count_online
+    @factory.create_robots(3)
+    assert_equal(3, @factory.count_online)
+  end
+
+  def test_index_lookup
+    robots = @factory.create_robots(5).robots_all
+    assert_same(robots[2], @factory[2])
+  end
 end
