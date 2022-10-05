@@ -34,6 +34,12 @@ class UniqueNames
     self
   end
 
+  # Enumerator for all possible names as arrays of letter-digit arrays:
+  # [[l, l], [d, d, d]].
+  def sequences
+    letter_digit_sequences(letter_count, number_count)
+  end
+
   private
 
   attr_reader :names
