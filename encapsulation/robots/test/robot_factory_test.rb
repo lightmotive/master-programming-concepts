@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
-require 'minitest'
 require 'minitest/autorun'
+require 'minitest/reporters'
+MiniTest::Reporters.use!
+
 require './lib/robot_factory'
 
-class RobotScalableTest < Minitest::Test
+class RobotFactoryTest < Minitest::Test
   DIFFERENT_ROBOT_NAME_SEED = 1234
   SAME_INITIAL_ROBOT_NAME_SEED = 1000
   NAME_REGEXP = /\A[A-Z]{2}\d{3}\z/.freeze

@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-require_relative 'robot_names'
-require_relative 'robot_list'
+require_relative 'unique_names'
+require_relative 'fast_list'
 require_relative 'robot'
 
 # Create and manage robots with individual and batch management capabilities.
 class RobotFactory
   def initialize
-    @names = RobotNames.new
-    @robots = RobotList.new
+    @names = UniqueNames.new
+    @robots = FastList.new
   end
 
   def create_robot
