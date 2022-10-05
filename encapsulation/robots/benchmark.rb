@@ -2,7 +2,7 @@
 
 # ** Benchmark setup **
 class RobotBenchmarkConfig
-  attr_reader :create_count, :reset_count, :robots
+  attr_reader :create_count, :reset_count
 
   def initialize(load_path, create_count: 676_000, reset_count: 5)
     @load_path = load_path
@@ -14,19 +14,26 @@ class RobotBenchmarkConfig
   def init
     puts "** #{load_path} Benchmark **"
     load load_path
+    self
   end
 
   def create
     puts "Generating #{create_count} robots..."
+    self
   end
 
   def reset
     puts "Resetting #{reset_count} robots..."
+    self
+  end
+
+  def robot_count
+    robots.size
   end
 
   protected
 
-  attr_reader :load_path
+  attr_reader :load_path, :robots
 end
 
 class RobotBenchmarkNonFactoryConfig < RobotBenchmarkConfig
@@ -39,6 +46,7 @@ class RobotBenchmarkNonFactoryConfig < RobotBenchmarkConfig
   def reset
     super
     reset_count.times { |idx| robots[idx].reset }
+    self
   end
 end
 
@@ -46,20 +54,23 @@ class RobotBenchmarkFactoryConfig < RobotBenchmarkConfig
   def init
     super
     @factory = RobotFactory.new
+    self
   end
 
   def create
     super
     @factory.create_robots(create_count)
+    self
   end
 
   def reset
     super
     @factory.reset_robots(@factory[0...reset_count])
+    self
   end
 
-  def robots
-    @factory.robots_all
+  def robot_count
+    @factory.count_online
   end
 
   private
@@ -91,11 +102,10 @@ class RobotBenchmark
   def bm_create
     start_time = Time.now
     config.create
-    format_result('Generated', config.robots.size, Time.now - start_time)
+    format_result('Generated', config.robot_count, Time.now - start_time)
   end
 
   def bm_reset
-    config.robots.shuffle!
     start_time = Time.now
     config.reset
     format_result('Reset', config.reset_count, Time.now - start_time)
