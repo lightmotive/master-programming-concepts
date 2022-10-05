@@ -47,12 +47,12 @@ class RobotFactoryTest < Minitest::Test
 
   def test_create_all_possible_robots
     create_count = 676_000
-    robots = @factory.create_robots(676_000).robots_all
+    robots = @factory.create_robots(676_000).robots_to_a
     assert_equal(create_count, robots.map(&:name).uniq.size)
   end
 
   def test_reset_robots_returns_array_of_original_objects_with_new_names
-    robots = @factory.create_robots(5).robots_all
+    robots = @factory.create_robots(5).robots_to_a
     original_robot_names = robots.map(&:name)
     reset_robots = @factory.reset_robots(robots)
     assert_equal(robots.map(&:object_id), reset_robots.map(&:object_id))
@@ -60,7 +60,7 @@ class RobotFactoryTest < Minitest::Test
   end
 
   def test_reset_robots_by_name
-    robots = @factory.create_robots(3).robots_all
+    robots = @factory.create_robots(3).robots_to_a
     original_robot_names = robots.map(&:name)
     reset_robots = @factory.reset_robots(original_robot_names)
     assert_equal(0, original_robot_names.intersection(reset_robots.map(&:name)).size)
@@ -71,19 +71,19 @@ class RobotFactoryTest < Minitest::Test
   end
 
   def test_shutdown_robot
-    robots = @factory.create_robots(3).robots_all
+    robots = @factory.create_robots(3).robots_to_a
     @factory.shutdown_robot(robots[1])
     robots.delete(robots[1])
-    assert_equal(robots, @factory.robots_all)
+    assert_equal(robots, @factory.robots_to_a)
   end
 
   def test_count_online
     @factory.create_robots(3)
-    assert_equal(3, @factory.count_online)
+    assert_equal(3, @factory.robots_count)
   end
 
   def test_index_lookup
-    robots = @factory.create_robots(5).robots_all
+    robots = @factory.create_robots(5).robots_to_a
     assert_same(robots[2], @factory[2])
   end
 end

@@ -59,11 +59,11 @@ class RobotFactory
     robots.[](*args)
   end
 
-  def count_online
+  def robots_count
     robots.size
   end
 
-  def robots_all
+  def robots_to_a
     robots.to_a
   end
 

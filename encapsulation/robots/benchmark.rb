@@ -70,7 +70,7 @@ class RobotBenchmarkFactoryConfig < RobotBenchmarkConfig
   end
 
   def robot_count
-    @factory.count_online
+    @factory.robots_count
   end
 
   private
