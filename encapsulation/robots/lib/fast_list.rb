@@ -6,8 +6,8 @@
 #
 # Key public behaviors:
 # - `add(item)`:
-# - `add_batch(item_array)`: list maintenance will run after concatenating all
-#   items.
+# - `add_count(count) { |idx| item_to_add }`: add a number of items
+#   sequentially. Improves performance.
 # - `batch_maintenance_completed!`: invoke after modifying items that would
 #   change the sort order.
 class FastList
@@ -36,8 +36,10 @@ class FastList
     items.delete_at(delete_at_idx)
   end
 
-  def add_batch(item_array)
-    items.concat(item_array)
+  def add_count(count)
+    count.times do
+      items << yield
+    end
     batch_maintenance_completed!
   end
 

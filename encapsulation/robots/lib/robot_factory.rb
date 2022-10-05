@@ -17,14 +17,13 @@ class RobotFactory
   end
 
   def create_robots(count)
-    new_robots = []
-    count.times do
+    robots.add_count(count) do
       robot = Robot.new(names.use!)
       yield robot if block_given?
-      new_robots << robot
+      robot
     end
-    robots.add_batch(new_robots)
-    new_robots
+
+    self
   end
 
   def reset_robot(robot_or_name)
