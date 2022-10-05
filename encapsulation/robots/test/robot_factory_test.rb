@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
-require 'minitest/autorun'
-require 'minitest/reporters'
-MiniTest::Reporters.use!
-
+require_relative 'test_helper'
 require './lib/robot_factory'
 
 class RobotFactoryTest < Minitest::Test
