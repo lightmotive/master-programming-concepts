@@ -38,8 +38,8 @@ class FastList
   end
 
   def add_count(count)
-    count.times do
-      items << yield
+    count.times do |idx|
+      items << yield(idx)
     end
     batch_completed!
   end
