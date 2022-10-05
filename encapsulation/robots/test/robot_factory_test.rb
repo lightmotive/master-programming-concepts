@@ -53,4 +53,12 @@ class RobotFactoryTest < Minitest::Test
     robots = @factory.create_robots(676_000)
     assert_equal(create_count, robots.map(&:name).uniq.size)
   end
+
+  def test_reset_robots_returns_array_of_original_objects_with_new_names
+    robots = @factory.create_robots(5)
+    original_robot_names = robots.map(&:name)
+    reset_robots = @factory.reset_robots(robots)
+    assert_equal(robots.map(&:object_id), reset_robots.map(&:object_id))
+    assert_equal(0, original_robot_names.intersection(reset_robots.map(&:name)).size)
+  end
 end

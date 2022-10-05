@@ -8,6 +8,8 @@
 # - `#reset(new_name)`: currently assigns the provided new_name; would also
 #   selectively reset internal state as the robot becomes more complex.
 class Robot
+  include Comparable
+
   attr_reader :name
 
   def initialize(name)

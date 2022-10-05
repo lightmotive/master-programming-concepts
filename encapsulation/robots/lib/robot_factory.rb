@@ -38,16 +38,13 @@ class RobotFactory
 
   # Always returns Robot object array, even if array contains name strings.
   def reset_robots(robot_or_name_array)
-    robots_reset = robot_or_name_array.map do |robot_or_name|
-      robot = robot_by(robot_or_name)
-      next if robot.nil?
-
+    robots_to_reset = robot_or_name_array.map(&method(:robot_by))
+    robots_to_reset.each do |robot|
       robot_reset!(robot)
       yield robot if block_given?
-      robot
     end
     robots.batch_maintenance_completed!
-    robots_reset
+    robots_to_reset
   end
 
   def shutdown_robot(name)
@@ -76,8 +73,9 @@ class RobotFactory
   end
 
   def robot_by(element)
-    return element if element.instance_of?(Robot)
+    return element if element.is_a?(Robot)
+    return robots.find { |item| element <=> item.name } if element.is_a?(String)
 
-    robots.find(element)
+    raise StandardError, "element must be a #{Robot.name} or a String."
   end
 end

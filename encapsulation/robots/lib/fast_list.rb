@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # A list optimized for fast seeking.
+# - Items must define `<=>` for sorting purposes.
 # - Uses binary search internally, so the list is always sorted.
 #
 # Key public behaviors:
@@ -10,29 +11,26 @@
 # - `batch_maintenance_completed!`: invoke after modifying items that would
 #   change the sort order.
 class FastList
-  include Enumerable
-
   def initialize
     @items = []
   end
 
-  def each(&block)
-    items.each(&block)
+  def find(item_to_find = nil, &block)
+    return items.bsearch(&block) if block_given?
+    return nil if item_to_find.nil?
+
+    items.bsearch { |item| item_to_find <=> item }
   end
 
-  def find(name)
-    items.bsearch { |r| name <=> r.name }
-  end
-
-  def add(item)
-    insert_before_idx = items.bsearch_index { |r| r.name > item.name } ||
+  def add(item_to_add)
+    insert_before_idx = items.bsearch_index { |item| item > item_to_add } ||
                         items.size
-    items.insert(insert_before_idx, item)
-    item
+    items.insert(insert_before_idx, item_to_add)
+    item_to_add
   end
 
-  def delete(item)
-    delete_at_idx = items.bsearch_index { |r| r.name <=> item.name }
+  def delete(item_to_delete)
+    delete_at_idx = items.bsearch_index { |item| item_to_delete <=> item }
     return nil if delete_at_idx.nil?
 
     items.delete_at(delete_at_idx)
@@ -44,7 +42,7 @@ class FastList
   end
 
   def batch_maintenance_completed!
-    items.sort_by!(&:name)
+    items.sort!
   end
 
   def [](*args)
