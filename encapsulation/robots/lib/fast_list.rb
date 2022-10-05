@@ -2,15 +2,14 @@
 
 # A list optimized for fast seeking.
 # - Items must define `<=>` for sorting purposes.
-# - Uses binary search internally, so the list is always sorted.
+# - Uses binary search internally, so the list will always be sorted.
 #
 # Key public behaviors:
 # - `#add(item)`:
 # - `#add_count(count) { |idx| item_to_add }`: add a number of items
 #   sequentially. Improves performance over sequential `#add` invocations.
-# - `#batch_process { ... }`: provide block that processes multiple objects
-#   that are stored in list. Must be used when mutating list items in a way that
-#   would change sort order. List is sorted after block returns.
+# - `#batch_mutate { ... }`: give block that mutates multiple stored objects in
+#   a way that would change sort order. List is sorted after block returns.
 class FastList
   def initialize
     @items = []
@@ -44,7 +43,7 @@ class FastList
     batch_completed!
   end
 
-  def batch_process
+  def batch_mutate
     yield
     batch_completed!
   end

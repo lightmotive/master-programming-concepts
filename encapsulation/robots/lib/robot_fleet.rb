@@ -38,7 +38,7 @@ class RobotFleet
   # Always returns Robot object array, even if array contains name strings.
   def reset_robots(robot_or_name_array)
     robots_to_reset = robot_or_name_array.map(&method(:robot_by))
-    robots.batch_process do
+    robots.batch_mutate do
       robots_to_reset.each do |robot|
         robot_reset!(robot)
         yield robot if block_given?

@@ -74,7 +74,7 @@ class FastListTest < MiniTest::Test
     list = FastList.new
     items = 3.times.map { |idx| TestItem.new(idx + 1) }.to_a
     list.add_count(items.size) { |idx| items[idx] }
-    list.batch_process { items[1].value = -1 }
+    list.batch_mutate { items[1].value = -1 }
     assert_equal(-1, items[1].value)
     assert_equal(items.sort, list.to_a)
   end
