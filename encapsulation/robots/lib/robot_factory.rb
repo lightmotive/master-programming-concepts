@@ -12,13 +12,13 @@ class RobotFactory
   end
 
   def create_robot
-    robot = Robot.new(names.use!)
+    robot = robot_create!
     robots.add(robot)
   end
 
   def create_robots(count)
     robots.add_count(count) do
-      robot = Robot.new(names.use!)
+      robot = robot_create!
       yield robot if block_given?
       robot
     end
@@ -70,6 +70,10 @@ class RobotFactory
   private
 
   attr_reader :names, :robots
+
+  def robot_create!
+    Robot.new(names.use!)
+  end
 
   def robot_reset!(robot)
     names.release!(robot.name)
