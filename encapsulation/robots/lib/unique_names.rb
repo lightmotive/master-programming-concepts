@@ -24,7 +24,7 @@ class UniqueNames
   end
 
   def use!
-    raise StandardError, 'All names are in use' if names.empty?
+    raise StandardError, 'No names available' if names.empty?
 
     names.shift
   end
@@ -32,6 +32,14 @@ class UniqueNames
   def release!(name)
     names << name
     self
+  end
+
+  def [](*args)
+    names.[](*args)
+  end
+
+  def to_a
+    names.dup
   end
 
   # Enumerator for all possible names as arrays of letter-digit arrays:
