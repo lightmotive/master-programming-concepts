@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # ** Benchmark setup **
-class RobotBenchmarkConfig
+class BenchmarkConfig
   attr_reader :create_count, :reset_count
 
   def initialize(load_path, create_count: 676_000, reset_count: 5)
@@ -36,7 +36,7 @@ class RobotBenchmarkConfig
   attr_reader :load_path, :robots
 end
 
-class RobotBenchmarkNonFactoryConfig < RobotBenchmarkConfig
+class RobotBenchmarkConfig < BenchmarkConfig
   def create
     super
     robots << Robot.new while robots.size < create_count
@@ -50,35 +50,35 @@ class RobotBenchmarkNonFactoryConfig < RobotBenchmarkConfig
   end
 end
 
-class RobotBenchmarkFactoryConfig < RobotBenchmarkConfig
+class RobotFleetBenchmarkConfig < BenchmarkConfig
   def init
     super
-    @factory = RobotFactory.new
+    @fleet = RobotFleet.new
     self
   end
 
   def create
     super
-    @factory.create_robots(create_count)
+    @fleet.create_robots(create_count)
     self
   end
 
   def reset
     super
-    @factory.reset_robots(@factory[0...reset_count])
+    @fleet.reset_robots(@fleet[0...reset_count])
     self
   end
 
   def robot_count
-    @factory.robots_count
+    @fleet.robots_count
   end
 
   private
 
-  attr_reader :factory
+  attr_reader :fleet
 end
 
-class RobotBenchmark
+class Benchmark
   def initialize(config)
     @config = config
   end
@@ -123,19 +123,19 @@ class RobotBenchmark
 end
 
 case ARGV[0]
-when 'robot' then RobotBenchmark.new(
-  RobotBenchmarkNonFactoryConfig.new(
+when 'robot' then Benchmark.new(
+  RobotBenchmarkConfig.new(
     '../../../ls-rb130-exercises/07_challenges/medium/robot.rb'
   )
 ).run
-when 'robot_alt' then RobotBenchmark.new(
-  RobotBenchmarkNonFactoryConfig.new(
+when 'robot_alt' then Benchmark.new(
+  RobotBenchmarkConfig.new(
     '../../../ls-rb130-exercises/07_challenges/medium/robot_alt.rb',
     reset_count: 50_000
   )
 ).run
-when 'robot_scalable' then RobotBenchmark.new(
-  RobotBenchmarkFactoryConfig.new('./lib/robot_factory.rb', reset_count: 50_000)
+when 'robot_scalable' then Benchmark.new(
+  RobotFleetBenchmarkConfig.new('./lib/robot_fleet.rb', reset_count: 50_000)
 ).run
 end
 
@@ -177,7 +177,7 @@ end
 # Trade-offs due to generating and randomizing all possible names at program
 # start:
 # - Slightly slower startup time; probably not a problem in a scenario where a
-#   class/factory is initialized only occasionally.
+#   class/fleet is initialized only occasionally.
 # - Higher initial memory usage; we're not storing a lot of data, so it wouldn't
 #   be an issue in most cases.
 

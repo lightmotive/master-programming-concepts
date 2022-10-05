@@ -5,7 +5,7 @@ require_relative 'fast_list'
 require_relative 'robot'
 
 # Create and manage robots with individual and batch management capabilities.
-class RobotFactory
+class RobotFleet
   def initialize
     @names = UniqueNames.new
     @robots = FastList.new
