@@ -8,6 +8,9 @@
 # - `#add(item)`:
 # - `#add_count(count) { |idx| item_to_add }`: add a number of items
 #   sequentially. Improves performance over sequential `#add` invocations.
+# - `#mutate_one(item) { |item| ... }`: mutate one item in a way that would
+#   change its sort position. Item is removed from the list, yielded, and then
+#   added back to the list in sorted position.
 # - `#batch_mutate { ... }`: give block that mutates multiple stored objects in
 #   a way that would change sort order. List is sorted after block returns.
 class FastList
@@ -34,6 +37,19 @@ class FastList
     return nil if delete_at_idx.nil?
 
     items.delete_at(delete_at_idx)
+  end
+
+  def mutate_one(item)
+    raise StandardError, 'Block required' unless block_given?
+
+    delete(item)
+    begin
+      yield(item)
+    rescue StandardError => e
+      raise e
+    ensure
+      add(item)
+    end
   end
 
   def add_count(count)

@@ -30,9 +30,7 @@ class RobotFleet
     robot = robot_by(robot_or_name)
     return if robot.nil?
 
-    robots.delete(robot)
-    robot_reset!(robot)
-    robots.add(robot)
+    robots.mutate_one(robot) { |r| robot_reset!(r) }
   end
 
   # Always returns Robot object array, even if array contains name strings.

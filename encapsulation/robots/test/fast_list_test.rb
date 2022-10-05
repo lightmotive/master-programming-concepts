@@ -19,9 +19,9 @@ class FastListTest < MiniTest::Test
   end
 
   def setup
+    @default_items = 5.times.map { |idx| TestItem.new((idx + 1).to_s) }
     @list = FastList.new
-    @list.add_count(5) { |idx| idx }
-    @default_items = 5.times.map.to_a
+    @list.add_count(5) { |idx| @default_items[idx] }
   end
 
   def test_default_items_exist
@@ -33,27 +33,31 @@ class FastListTest < MiniTest::Test
   end
 
   def test_get_at_index
-    assert_equal(1, @list[1])
+    assert_same(@default_items[1], @list[1])
+  end
+
+  def test_get_slice
+    assert_equal(@default_items[1, 3], @list[1, 3])
   end
 
   def test_get_range
-    assert_equal([2, 3], @list[2..3])
+    assert_equal(@default_items[2..3], @list[2..3])
   end
 
   def test_find_by_item
-    assert_equal(2, @list.find(2))
+    assert_equal(@default_items[2], @list.find(@default_items[2]))
   end
 
   def test_find_with_block
-    assert_equal(1, @list.find { |item| 1 <=> item })
-    assert_equal(3, @list.find { |item| item > 2 })
+    assert_equal(@default_items[3], @list.find { |item| @default_items[3] <=> item })
+    assert_equal(@default_items[2], @list.find { |item| item > @default_items[1] })
   end
 
   def test_add_is_sorted
-    item_to_add = @default_items.last + 10
+    item_to_add = TestItem.new('9')
     @list.add(item_to_add)
     assert_equal((@default_items << item_to_add).sort, @list.to_a)
-    second_item_to_add = @default_items[-2] + 1
+    second_item_to_add = TestItem.new('8')
     @list.add(second_item_to_add)
     assert_equal((@default_items << second_item_to_add).sort, @list.to_a)
   end
@@ -65,17 +69,23 @@ class FastListTest < MiniTest::Test
   end
 
   def test_delete
-    @list.delete(2)
-    @default_items.delete(2)
+    @list.delete(@default_items[2])
+    @default_items.delete(@default_items[2])
     assert_equal(@default_items, @list.to_a)
   end
 
-  def test_batch_process
-    list = FastList.new
-    items = 3.times.map { |idx| TestItem.new(idx + 1) }.to_a
-    list.add_count(items.size) { |idx| items[idx] }
-    list.batch_mutate { items[1].value = -1 }
-    assert_equal(-1, items[1].value)
-    assert_equal(items.sort, list.to_a)
+  def test_batch_mutate
+    @list.batch_mutate { @default_items[1].value = '0' }
+    assert_equal(@default_items.sort, @list.to_a)
+  end
+
+  def test_mutate_one
+    @list.mutate_one(@default_items[1]) { |item| item.value = '0' }
+    @default_items.sort!
+    assert_equal(@default_items, @list.to_a)
+    assert_raises(NameError) do
+      @list.mutate_one(@default_items[3], &:fake_method)
+    end
+    assert_equal(@default_items, @list.to_a)
   end
 end
