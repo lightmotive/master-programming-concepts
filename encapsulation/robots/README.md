@@ -4,23 +4,25 @@
 
 This small program was inspired by Launch School's [Robot Name exercise](https://launchschool.com/exercises/9302dd42).
 
-My [original solution](https://github.com/lightmotive/ls-rb130-exercises/blob/main/07_challenges/medium/robot.rb) and [alternative solution](https://github.com/lightmotive/ls-rb130-exercises/blob/main/07_challenges/medium/robot_alt.rb) both touched on encapsulation and scalability.
+My [original solution (robot.rb)](https://github.com/lightmotive/ls-rb130-exercises/blob/main/07_challenges/medium/robot.rb) and [alternative solution (robot_alt.rb)](https://github.com/lightmotive/ls-rb130-exercises/blob/main/07_challenges/medium/robot_alt.rb) both touched on encapsulation and scalability.
 
 Here, I further explore encapsulation and, to a lesser degree, scalability.
 
- This is a better-encapsulated version of the `robot_alt.rb` implementation. It also introduces new well-encapsulated functionality with classes that conceptualize related groups of behaviors.
+This is a better-encapsulated version of the `robot_alt.rb` implementation. It also introduces new well-encapsulated functionality with classes that conceptualize related groups of behaviors.
 
  ### Scalability considerations
 
-Initializing many Robot instances in rapid succession, such as when bringing an entire Robot factory online, is CPU-intensive. So is resetting a batch of robots.
+With the original solution, initializing many `Robot` instances in rapid succession--imagine bringing an entire fleet of nanobots online--was CPU-intensive. So was resetting robots. The performance was good with lower numbers of potential robots, but slowed dramatically upon reaching the capacity of 676K robots.
 
-The *alternative solution* linked above solved the problem of quickly initializing robots, but left one problem unsolved: efficiently [managing online robots. This implementation encapsulates core program aspects and uses binary search to support rapid robot management.
+The *alternative solution* linked above solved the problem of quickly initializing robots, but left one problem unsolved: efficiently managing online robots.
 
-Managing many robots efficiently requires maintaining a sorted list of them so they can be easily found using a binary search algorith. Ruby's core library includes Array methods that make binary search easy: `bsearch` and `bsearch_index`. Another Array method that's useful in conjunction with `bsearch_index` is `insert`, which enables inserting a new value into sorted position that's found using `bsearch_index`.
+This program encapsulates core components and uses a binary search algorithm to support rapid robot management like reset, shutdown, and any other future feature that requires finding bots that have a specific state.
 
-With robot management capabilities, the program also needs to avoid slowing down batch robot maintenenace (e.g., quickly bringing an entire factory of robots online or resetting a robot group) with many sequential and repetitive `robots` array scan or sort operations. To accomplish that, the `RobotFactory` needs to support "batch maintenance" that modifies "individual maintenance" behaviors as follows:
+Managing many robots efficiently requires maintaining a sorted list of them so they can be located using binary search. Ruby's core library offers that through the `bsearch` and `bsearch_index` Array methods. Another Array method that's useful in conjunction with `bsearch_index` is `insert`, which enables inserting a new value into sorted position that was determined using `bsearch_index`.
 
-- Complete batch maintenance, yielding robot instances to a block if given.
+With new robot management capabilities, the program also needs a feature that prevents slowing down batch robot maintenenace with many sequential and repetitive `robots` array scan/sort operations. To accomplish that, the `RobotFleet` needs to support "batch maintenance" that modifies "individual maintenance" behaviors as follows:
+
+- Complete batch maintenance that requires re-sorting the array, yielding robot instances to a block if given.
 - When batch processing is complete, execute post-batch operations like sorting the `robots` array.
   - A single sort operation is much faster than trying to maintain sort positions throughout batch processing.
 
