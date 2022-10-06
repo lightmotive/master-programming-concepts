@@ -56,11 +56,17 @@ class FastList
     count.times do |idx|
       items << yield(idx)
     end
+  rescue StandardError => e
+    raise e
+  ensure
     batch_completed!
   end
 
   def batch_mutate
     yield
+  rescue StandardError => e
+    raise e
+  ensure
     batch_completed!
   end
 

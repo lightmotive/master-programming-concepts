@@ -74,18 +74,49 @@ class FastListTest < MiniTest::Test
     assert_equal(@default_items, @list.to_a)
   end
 
+  def test_add_count
+    new_item = TestItem.new('0')
+    assert_raises(StandardError) do
+      @list.add_count(2) do |idx|
+        raise StandardError if idx > 0
+
+        @default_items.push(new_item)
+        new_item
+      end
+    end
+    assert_equal(1, @default_items.count(new_item))
+    assert_equal(@default_items.sort, @list.to_a)
+  end
+
   def test_batch_mutate
     @list.batch_mutate { @default_items[1].value = '0' }
     assert_equal(@default_items.sort, @list.to_a)
   end
 
+  def test_batch_mutate_forwards_exception
+    assert_raises(NoMethodError) do
+      @list.batch_mutate do
+        @list.find(@default_items[2]).value = '9'
+        @list.find(@default_items[3]).fake_method
+      end
+    end
+    assert_equal('9', @default_items[2].value)
+    assert_equal(@default_items.sort, @list.to_a)
+  end
+
   def test_mutate_one
     @list.mutate_one(@default_items[1]) { |item| item.value = '0' }
-    @default_items.sort!
-    assert_equal(@default_items, @list.to_a)
-    assert_raises(NameError) do
-      @list.mutate_one(@default_items[3], &:fake_method)
+    assert_equal(@default_items.sort, @list.to_a)
+  end
+
+  def test_mutate_one_forwards_exception
+    assert_raises(StandardError) do
+      @list.mutate_one(@default_items[3]) do |item|
+        item.value = '0'
+        raise StandardError
+      end
     end
-    assert_equal(@default_items, @list.to_a)
+    assert_equal('0', @default_items[3].value)
+    assert_equal(@default_items.sort, @list.to_a)
   end
 end
