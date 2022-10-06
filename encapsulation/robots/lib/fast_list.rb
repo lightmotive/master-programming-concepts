@@ -6,6 +6,7 @@
 #
 # Key public behaviors:
 # - `#add(item)`:
+# - `#add_loop { |idx| item_to_add }`: Add items until `break`.
 # - `#add_count(count) { |idx| item_to_add }`: add a number of items
 #   sequentially. Improves performance over sequential `#add` invocations.
 # - `#mutate_one(item) { |item| ... }`: mutate one item in a way that would
@@ -49,6 +50,18 @@ class FastList
       raise e
     ensure
       add(item)
+    end
+  end
+
+  def add_loop
+    idx = 0
+    loop do
+      items << yield(idx)
+      idx += 1
+    rescue StandardError => e
+      raise e
+    ensure
+      batch_completed!
     end
   end
 

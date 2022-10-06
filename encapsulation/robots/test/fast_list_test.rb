@@ -74,7 +74,27 @@ class FastListTest < MiniTest::Test
     assert_equal(@default_items, @list.to_a)
   end
 
-  def test_add_count
+  def test_add_loop
+    @list.add_loop do |idx|
+      break if idx > 1
+
+      item = TestItem.new("-#{idx + 1}")
+      @default_items.push(item)
+      item
+    end
+    assert_includes(@default_items, TestItem.new('-2'))
+    assert_equal(@default_items.sort, @list.to_a)
+  end
+
+  def test_add_loop_forwards_exception
+    assert_raises(StandardError) do
+      @list.add_loop do
+        raise StandardError
+      end
+    end
+  end
+
+  def test_add_count_forwards_exception
     new_item = TestItem.new('0')
     assert_raises(StandardError) do
       @list.add_count(2) do |idx|
