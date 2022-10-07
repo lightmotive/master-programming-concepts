@@ -4,10 +4,10 @@
 class BenchmarkConfig
   attr_reader :create_count, :reset_count
 
-  def initialize(load_path, create_count: 676_000, reset_count: 5)
-    @load_path = load_path
-    @create_count = create_count
-    @reset_count = reset_count
+  def initialize(benchmark_data)
+    @load_path = benchmark_data[:load_path]
+    @create_count = benchmark_data[:create_count] || 676_000
+    @reset_count = benchmark_data[:reset_count] || 5
     @robots = []
   end
 
@@ -79,8 +79,8 @@ class RobotFleetBenchmarkConfig < BenchmarkConfig
 end
 
 class Benchmark
-  def initialize(config)
-    @config = config
+  def initialize(data)
+    @config = data[:config_class].new(data)
   end
 
   def run
@@ -122,22 +122,39 @@ class Benchmark
   end
 end
 
-case ARGV[0]
-when 'robot' then Benchmark.new(
-  RobotBenchmarkConfig.new(
-    '../../../ls-rb130-exercises/07_challenges/medium/robot.rb'
-  )
-).run
-when 'robot_alt' then Benchmark.new(
-  RobotBenchmarkConfig.new(
-    '../../../ls-rb130-exercises/07_challenges/medium/robot_alt.rb',
-    reset_count: 50_000
-  )
-).run
-when 'robot_scalable' then Benchmark.new(
-  RobotFleetBenchmarkConfig.new('./lib/robot_fleet.rb', reset_count: 50_000)
-).run
+BENCHMARKS = {
+  'robot': { name: 'robot',
+             config_class: RobotBenchmarkConfig,
+             load_path: '../../../ls-rb130-exercises/07_challenges/medium/robot.rb',
+             create_count: nil, reset_count: nil },
+  'robot_alt': { name: 'robot_alt',
+                 config_class: RobotBenchmarkConfig,
+                 load_path: '../../../ls-rb130-exercises/07_challenges/medium/robot_alt.rb',
+                 create_count: nil, reset_count: 50_000 },
+  'robot_scalable': { name: 'robot_scalable',
+                      config_class: RobotFleetBenchmarkConfig,
+                      load_path: './lib/robot_fleet.rb',
+                      create_count: nil, reset_count: 50_000 }
+}.freeze
+BENCHMARK_NAMES = BENCHMARKS.keys.map(&:to_s).freeze
+
+def select_benchmark_name
+  puts 'Which benchmark do you want to run?'
+  puts BENCHMARK_NAMES
+
+  loop do
+    print '> '
+    input = gets.downcase.strip
+    break input if BENCHMARK_NAMES.include?(input)
+
+    puts 'Please enter a benchmark name listed above.'
+  end
 end
+
+benchmark_name = ARGV[0] || select_benchmark_name
+benchmark_data = BENCHMARKS[benchmark_name.to_sym]
+
+Benchmark.new(benchmark_data).run
 
 # ***
 # robot.rb performance analysis
