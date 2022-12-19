@@ -1,29 +1,39 @@
 # frozen_string_literal: true
 
 # Tradeoffs:
-# - Succinct
-# - Requires deeper regex knowledge
-def match_using_regex(string)
+# - Succinct.
+# - Requires deeper regex knowledge.
+# - No need to create a separate array of words, which means lower working
+#   memory usage.
+# - Better performance when one needs to know the last-matched alternation.
+def matches_with_regex(string)
   regex = /(\b(?=\w{6,12}\b)\w{0,9}(cat|dog|mouse)\w*)/
   string.scan(regex)
 end
 
 # Tradeoffs:
-# - Easy to understand without deep regex knowledge.
-# - Greater memory usage, especially with large strings (can offset that with line enumeration).
-def match_using_iteration(string)
-  regex = /\w*(cat|dog|mouse)\w*/
-  string.split.each_with_object([]) do |word, matches|
+# - Much more code than the Regex solution, but easier to understand and
+#   maintain without requiring deep regex knowledge.
+# - Slightly better CPU performance.
+def matches_with_iteration(string)
+  words_to_find_within = %w[cat dog mouse]
+  string.enum_for(:split, ' ').with_object([]) do |word, matches|
     next unless word.size.between?(6, 12)
 
-    capture_group = regex.match(word)[1]
-    matches << [word, capture_group] if capture_group
+    previously_found_index = nil
+    found_within = nil
+    words_to_find_within.each do |word_to_find|
+      index = word.index(word_to_find)
+      next if index.nil? || (!previously_found_index.nil? && index < previously_found_index)
+
+      previously_found_index = index
+      found_within = word_to_find
+    end
+    next if found_within.nil?
+
+    matches << [word, found_within]
   end
 end
-
-# Surprisingly, CPU performance is not a significant tradeoff in either case,
-# even with longer strings. However, a system with slower memory performance
-# might make a difference.
 
 require_relative '../../ruby-common/benchmark_report'
 require_relative '../../ruby-common/test'
@@ -37,12 +47,12 @@ TESTS = [
                       %w[mousedog dog]] * 500 }
 ].freeze
 
-run_tests('regex', TESTS, ->(input) { match_using_regex(input) })
-run_tests('iteration', TESTS, ->(input) { match_using_iteration(input) })
+return unless run_tests('regex', TESTS, ->(input) { matches_with_regex(input) })
+return unless run_tests('iteration', TESTS, ->(input) { matches_with_iteration(input) })
 
 benchmark_report(TESTS,
                  [
-                   { label: 'regex', method: ->(input) { match_using_regex(input) } },
-                   { label: 'iteration', method: ->(input) { match_using_iteration(input) } }
+                   { label: 'regex', method: ->(input) { matches_with_regex(input) } },
+                   { label: 'iteration', method: ->(input) { matches_with_iteration(input) } }
                  ],
                  iterations: 1500)
