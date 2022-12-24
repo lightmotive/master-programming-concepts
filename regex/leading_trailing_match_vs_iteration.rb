@@ -2,6 +2,13 @@
 
 # Outcome:
 # - When matching simple leading/trailing values, iteration is over 3x faster!
+# Analysis:
+# - When it's possible to match a portion of a string--in this case, we only
+#   need to look at leading and trailing separators--iteration should be faster
+#   because it can look at a portion of a string instead of checking every
+#   character.
+# - There may be a faster regexes that what I wrote below; I'll explore this
+#   again when I learn something relevant.
 
 PATH_SEPARATOR = '/'
 class PathNormalizerRegex
